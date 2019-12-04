@@ -12,12 +12,13 @@ let defaultSettings = {
     DETECT_START_TIME: "07:16:00", //未成熟能量循环点击开始时间
     DETECT_END_TIME: "07:18:00", //未成熟能量循环点击结束时间
     DETECT_DURATION: 72000,  //未成熟能量的时间监测时长(单位：秒)，和DETECT_START_TIME DETECT_END_TIME是不同的策略
-    CLICK_IMMATURATE_INTERVAL: 200,  //循环点击未成熟能量的间隔（单位：毫秒）
+    CLICK_IMMATURATE_INTERVAL: 100,  //循环点击未成熟能量的间隔（单位：毫秒）
     JUMP_IN_FOREST_WAITING_TIME: 6000, //进入蚂蚁森林需要等待的时间
     PAGE_JUMP_WAITING_TIME: 1500, //页面跳转等待的时间
     PAGE_SCROLL_WAITING_TIME: 300, //页面翻动后预留的等待时间
     SCREEN_CLICK_WAITING_TIME: 50, //屏幕点击的时间间隔
-    KILL_AUTOJS_APP: true //结束autojs进程（安全起见，以防手机丢失后，定时任务解锁导致手机被使用）
+    KILL_AUTOJS_APP: true, //结束autojs进程（安全起见，以防手机丢失后，定时任务解锁导致手机被使用）
+    RUN_STRATEGY: "debug" //脚本运行策略：debug--调试
 };
 
 let scrollToEnd = (direction => {
@@ -291,7 +292,9 @@ let exitAutojs = () => {
 /**任务完成后的收尾工作 */
 let ending = () => {
     closeAFpage();
-    exitAutojs();
+    if (defaultSettings.RUN_STRATEGY != "debug") {
+        exitAutojs();
+    }
     device.cancelKeepingAwake();
 };
 
@@ -333,7 +336,7 @@ let ending = () => {
     collectFriendsEnergy();
 
     console.log("能量收取结束, 收尾...");
-    //   ending();
+    ending();
 
     toastLog("脚本自动关闭...");
 })();

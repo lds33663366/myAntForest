@@ -1,7 +1,14 @@
 function Device() {
 
+    let keyPadScreen = ()=> id("com.android.systemui:id/keyguard_host_view");/**密码锁屏界面 */
+
     /**密码解锁 */
     this.clickNums = (pw) => {
+
+        if (!keyPadScreen().exists()) {
+            throw Error("进入密码锁屏页面失败，解锁密码失败");
+        }
+
         /**两种方式获取按键 */
         let getNumericKeypad = num => id("com.android.systemui:id/key" + num);
         let getNumsBySingleDesc = num => desc(num);
@@ -50,10 +57,14 @@ function Device() {
             let x = device.width / 2;
             let y = device.height / 4;
 
-            var success = swipe(x, 3 * y, x, y, 200);
+            let swipeRetryTime = 3;
 
-            sleep(1000);
-            return success;
+            while (!keyPadScreen().exists() && swipeRetryTime--) {
+                var success = swipe(x, 3 * y, x, y, 200);
+                sleep(500);
+            }
+
+            return keyPadScreen().exists();
         }
 
     this.unlock = () => {
@@ -67,9 +78,9 @@ function Device() {
         this.wakeup();
         while (this.isLocked() && LOCK_RETRY_TIMES--) {
             if (this.swipe_layer()) {
-                sleep(1000);
+                sleep(500);
                 this.clickNums(pw);
-                sleep(1000);
+                sleep(500);
             }
             else {
                 console.log("滑动屏幕失败，可能是无障碍服务未启动");
